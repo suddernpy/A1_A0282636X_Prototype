@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Learning CUI Prototype – Safe Removal While Iterating</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="title">
+      <h1>Why loop over a copy?</h1>
+      <span class="sub">CS3249 A1 prototype · hard-coded, no LLM</span>
+    </div>
+    <ol class="stages" id="stages">
+      <li data-stage="1">1 Predict</li>
+      <li data-stage="2">2 Examine</li>
+      <li data-stage="3">3 Apply</li>
+    </ol>
+    <div class="demo">
+      <label>Demo persona
+        <select id="persona">
+          <option value="">— none —</option>
+          <option value="p2">P2 style (strong)</option>
+          <option value="p3">P3 style (partial)</option>
+          <option value="p1">P1 style (unsure)</option>
+        </select>
+      </label>
+      <button id="fill" type="button" disabled>Fill answer</button>
+      <button id="restart" type="button" class="ghost">Restart</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="left">
+      <div class="panel" id="codePanel">
+        <h2>Code <span class="hint" id="codeHint">click a line to ask about it</span></h2>
+        <pre id="code"></pre>
+      </div>
+      <div class="panel" id="displayPanel">
+        <h2>Execution display
+          <span class="stepper">
+            <button id="back" type="button">◀ Back</button>
+            <span id="stepCount"></span>
+            <button id="next" type="button">Next step ▶</button>
+            <button id="runAll" type="button" class="ghost">Run all</button>
+          </span>
+        </h2>
+        <div id="display"></div>
+      </div>
+    </section>
+
+    <section class="chat panel">
+      <h2>Conversation</h2>
+      <div id="messages" aria-live="polite"></div>
+      <div id="chips"></div>
+      <div id="context" class="context"></div>
+
+      <form id="chatForm" class="row">
+        <textarea id="chatInput" rows="2" placeholder="Type your answer…"></textarea>
+        <button type="submit" id="send">Send</button>
+      </form>
+
+      <form id="indForm" class="ind" hidden>
+        <label>1. Result after the loop <input id="indPredict" type="text" autocomplete="off"></label>
+        <label>2. Your reasoning <textarea id="indReason" rows="3"></textarea></label>
+        <div class="row">
+          <button type="button" id="hintBtn" class="ghost">Show hint (marks attempt as assisted)</button>
+          <button type="submit" id="indSubmit">Submit</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="content.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
