@@ -3,74 +3,87 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Learning CUI Prototype – Safe Removal While Iterating</title>
+  <title>Python Tutor – Removing Items Safely</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <div class="title">
-      <h1>Why loop over a copy?</h1>
-      <span class="sub">CS3249 A1 prototype · hard-coded, no LLM</span>
-    </div>
-    <ol class="stages" id="stages">
-      <li data-stage="1">1 Predict</li>
-      <li data-stage="2">2 Examine</li>
-      <li data-stage="3">3 Apply</li>
-    </ol>
-    <div class="demo">
-      <label>Demo persona
-        <select id="persona">
-          <option value="">— none —</option>
-          <option value="p2">P2 style (strong)</option>
-          <option value="p3">P3 style (partial)</option>
-          <option value="p1">P1 style (unsure)</option>
-        </select>
-      </label>
-      <button id="fill" type="button" disabled>Fill answer</button>
-      <button id="restart" type="button" class="ghost">Restart</button>
-    </div>
-  </header>
-
-  <main>
-    <section class="left">
-      <div class="panel" id="codePanel">
-        <h2>Code <span class="hint" id="codeHint">click a line to ask about it</span></h2>
-        <pre id="code"></pre>
+  <div class="app">
+    <aside class="history" id="historyPanel" aria-label="Past questions">
+      <button id="historyToggle" class="history-toggle" type="button" aria-expanded="true" aria-controls="historyPanel">‹</button>
+      <div class="history-content">
+        <h2>Past questions</h2>
+        <p class="muted history-empty" id="historyEmpty">Questions you ask will appear here.</p>
+        <ol id="historyList" class="history-list"></ol>
       </div>
-      <div class="panel" id="displayPanel">
-        <h2>Execution display
+    </aside>
+    <section class="chat" aria-label="Conversation with the tutor">
+      <header class="top">
+        <div class="brand">
+          <span class="logo" aria-hidden="true">Py</span>
+          <div>
+            <h1>Python Tutor</h1>
+          </div>
+        </div>
+        <ol class="stages" id="stages" aria-label="Progress">
+          <li data-stage="1">Predict</li>
+          <li data-stage="2">Examine</li>
+          <li data-stage="3">Apply</li>
+        </ol>
+        <div class="actions">
+          <span id="assisted" class="badge" hidden>Assisted</span>
+          <select id="persona" aria-label="Demo learner" title="Demo: pick a sample learner, then press Fill">
+            <option value="">Demo learner…</option>
+            <option value="p2">P2 style: strong reasoning</option>
+            <option value="p3">P3 style: partial / misconception</option>
+            <option value="p1">P1 style: unsure</option>
+          </select>
+          <button id="restart" type="button" class="ghost small">Restart</button>
+        </div>
+      </header>
+
+      <div id="thread" class="thread" role="log" aria-live="polite"></div>
+
+      <div id="chatExecution" class="chat-execution" aria-live="polite"></div>
+
+      <div class="dock">
+        <div id="chips" class="chips" aria-label="Suggested replies"></div>
+        <div id="selection" class="selection" hidden></div>
+        <form id="composer" class="composer">
+          <textarea id="input" rows="1" aria-label="Your message" placeholder="Type a message…"></textarea>
+          <button id="fill" type="button" class="ghost small composer-fill" disabled title="Type the sample learner's answer into the message box">Fill</button>
+          <button type="submit" id="send" aria-label="Send">➤</button>
+        </form>
+      </div>
+    </section>
+
+    <aside class="workspace" aria-label="Code and execution">
+      <div class="card progress-card" id="progressCard">
+        <h2>Learning progress</h2>
+        <div id="progressSummary" class="progress-summary"></div>
+      </div>
+      <div class="card custom-code-card">
+        <h2>Ask about your own Python</h2>
+        <textarea id="customCode" rows="5" placeholder="Paste Python code here…" aria-label="Your Python code"></textarea>
+        <input id="customQuestion" type="text" placeholder="What would you like to know?" aria-label="Your Python question">
+        <button id="askCustom" type="button">Ask about this code</button>
+        <p class="muted custom-note">The guided tutor exercise will stay on the current example.</p>
+      </div>
+      <div class="card" id="codeCard">
+        <h2>Code <span class="muted" id="codeHint"></span></h2>
+        <pre id="code" class="code"></pre>
+      </div>
+      <div class="card" id="displayCard">
+        <h2>Execution
           <span class="stepper">
-            <button id="back" type="button">◀ Back</button>
-            <span id="stepCount"></span>
-            <button id="next" type="button">Next step ▶</button>
-            <button id="runAll" type="button" class="ghost">Run all</button>
+            <button id="back" type="button" class="ghost small">◀ Back</button>
+            <span id="stepCount" class="muted"></span>
+            <button id="next" type="button" class="small">Next step ▶</button>
           </span>
         </h2>
         <div id="display"></div>
       </div>
-    </section>
-
-    <section class="chat panel">
-      <h2>Conversation</h2>
-      <div id="messages" aria-live="polite"></div>
-      <div id="chips"></div>
-      <div id="context" class="context"></div>
-
-      <form id="chatForm" class="row">
-        <textarea id="chatInput" rows="2" placeholder="Type your answer…"></textarea>
-        <button type="submit" id="send">Send</button>
-      </form>
-
-      <form id="indForm" class="ind" hidden>
-        <label>1. Result after the loop <input id="indPredict" type="text" autocomplete="off"></label>
-        <label>2. Your reasoning <textarea id="indReason" rows="3"></textarea></label>
-        <div class="row">
-          <button type="button" id="hintBtn" class="ghost">Show hint (marks attempt as assisted)</button>
-          <button type="submit" id="indSubmit">Submit</button>
-        </div>
-      </form>
-    </section>
-  </main>
+    </aside>
+  </div>
 
   <script src="content.js"></script>
   <script src="script.js"></script>
